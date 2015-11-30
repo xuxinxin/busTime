@@ -1,0 +1,39 @@
+.head{
+  text-align: center;
+  margin-bottom: 20px;
+}
+.next-bus{
+  margin-left: 10px;
+}
+table{
+  width: 400px;
+  margin: 0 auto;
+  text-align: center;
+  border: 1px solid #000000;
+  caption{
+    margin-bottom: 5px;
+  }
+  .direction{
+    font-weight: bolder;
+  }
+
+  th{
+    font-weight: bold;
+    padding: 15px 0;
+    font-size: 1.3rem;
+  }
+
+  td{
+    padding: 4px 0;
+  }
+
+  .past{
+    color: grey;
+    opacity: 0.6;
+  }
+  .next{
+    background: #c0c0c0;
+    color: yellow;
+  }
+}
+
