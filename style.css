@@ -34,7 +34,8 @@ table {
     font-size: 3em; }
 
   table {
-    width: 90%; }
+    width: 90%;
+    margin-bottom: 20px; }
 
   caption {
     margin-bottom: 25px; }
