@@ -25,35 +25,55 @@
         {time:"21:50",number:"循环"},
         {time:"22:40",number:"终止"}
     ];
-    var backBusTime = busTime.map(function(item){
-        var newItem = {};
-        var timeArray = item.time.split(":");
-        if(parseInt(timeArray[1])+10 >= 60){
+    var weekendBusTime = [
+        {time:"8:30" ,number:"1"},
+        {time:"8:50" ,number:"1"},
+        {time:"9:20" ,number:"2"},
+        {time:"11:20",number:"2"},
+        {time:"13:30",number:"1"},
+        {time:"14:00",number:"1"},
+        {time:"15:00",number:"1"},
+        {time:"16:30",number:"2"},
+        {time:"17:20",number:"1"},
+        {time:"17:40",number:"1"},
+        {time:"18:50",number:"1"},
+        {time:"20:30",number:"1"},
+        {time:"21:50",number:"循环"},
+        {time:"22:40",number:"终止"}
+    ];
 
-            var left = parseInt(timeArray[0])+1;
-            var right = (parseInt(timeArray[1])+10)%60;
-            if(right < 10){
-                right = '0'+ right;
-            }
-
-        }else{
-            left = parseInt(timeArray[0]);
-            right = parseInt(timeArray[1])+10;
-            if(left == 15){
-                right += 5;
-            }
-        }
-        newItem.time = left+":"+right;
-        newItem.number = item.number;
-        return newItem;
-    });
+    var backBusTime = getBackTime(busTime);
+    var weekendBackBusTime = getBackTime(weekendBusTime);
     window.b = backBusTime;
     $ = document.querySelector;
 
+    function getBackTime(busTime){
+       return busTime.map(function(item){
+            var newItem = {};
+            var timeArray = item.time.split(":");
+            if(parseInt(timeArray[1])+10 >= 60){
+
+                var left = parseInt(timeArray[0])+1;
+                var right = (parseInt(timeArray[1])+10)%60;
+                if(right < 10){
+                    right = '0'+ right;
+                }
+
+            }else{
+                left = parseInt(timeArray[0]);
+                right = parseInt(timeArray[1])+10;
+                if(left == 15 && right == 30){
+                    right += 5;
+                }
+            }
+            newItem.time = left+":"+right;
+            newItem.number = item.number;
+            return newItem;
+        });
+    }
+
     function getNextBusTime(busTime){
-
         var nextBusIndex = getNextBusIndex(busTime);
-
         if(nextBusIndex){
             return {
                 hour: +busTime[nextBusIndex].time.split(":")[0],
@@ -112,7 +132,7 @@
         }
     }
 
-
+    console.log(weekendBackBusTime);
 
     var $today = document.querySelector(".today");
     var $month = document.querySelector(".month");
@@ -121,13 +141,18 @@
     var $remainderTime = document.querySelector(".remainder-time");
     var $remainderMinute = document.querySelector(".reserve-minute");
     var $remainderSecond = document.querySelector(".reserve-second");
-    var $line = {};
+    var $direction = document.querySelector(".direction");
     var $nextBusTime = document.querySelector(".next-bus");
     var $table = document.querySelector("table");
     var today = new Date();
     $today.innerHTML = DayTransform[parseInt(today.getDay())];
 
     var realBusTime = busTime;
+
+    if(isWeekendNow()){
+        realBusTime = weekendBusTime;
+    }
+
     setTime();
     setInterval(setTime,1000);
     setNextTime();
@@ -145,11 +170,28 @@
             min: today.getMinutes(),
             sec: today.getSeconds()
         };
+        var nextBusTime = getNextBusTime(realBusTime);
         setRemainderTime();
+
+        if(nextBusTime.hour == now.hour && nextBusTime.min == now.min && now.sec < 3){
+            Event.trigger('tiktok');
+        }
+
+        if(isWeekendNow()){
+            if(realBusTime !== weekendBackBusTime && realBusTime !== weekendBusTime){
+                Event.trigger('tiktok');
+            }
+        }else{
+            if(realBusTime !== busTime && realBusTime !== backBusTime){
+                Event.trigger('tiktok');
+            }
+        }
+
     }
     //setTable(backBusTime);
 
     function setTable(data){
+        $table.innerHTML = '<caption>今天的班车时刻表 <span class="direction">(去谷里)</span></caption>';
         data.forEach(function(item,index){
             var className = "line line"+index;
             if(index < getNextBusIndex(busTime)){
@@ -157,20 +199,37 @@
             }else if(index == getNextBusIndex(busTime)){
                 className += " next";
             }
+
             var line = "<tr class='"+className+"'><td>"+item.time+"</td><td>"+item.number+"</td></tr>";
-            console.log(line);
             $table.innerHTML += line;
         });
-        $lines = document.querySelectorAll('.line');
+
+        $direction = document.querySelector(".direction");
+        $direction.addEventListener('click', function(){
+            switch (realBusTime) {
+                case busTime:
+                    Event.trigger('backFromCnvWeekday');
+                    break;
+                case backBusTime:
+                    Event.trigger('goToCnvWeekday');
+                    break;
+                case weekendBusTime:
+                    Event.trigger('backFromCnvWeekend');
+                    break;
+                case weekendBackBusTime:
+                    Event.trigger('goToCnvWeekend');
+                    break;
+                default :
+                    console.log("wrong");
+            }
+        })
     }
-
-
 
     function setNextTime(){
         var nextTime = getNextBusTime(realBusTime);
-        console.log(nextTime)
         if(nextTime){
-            $nextBusTime.innerText = "下一班车是"+nextTime.hour+":"+nextTime.min;
+            var minute = nextTime.min < 10 ? '0'+ nextTime.min : nextTime.min;
+            $nextBusTime.innerText = "下一班车是"+nextTime.hour+":"+minute;
         }else{
             $nextBusTime.innerText = "今天没有班车了"
         }
@@ -188,6 +247,65 @@
         }
 
     }
+
+    function isWeekendNow(){
+        var now = new Date();
+        return now.getDay() == 6 || now.getDay() == 0;
+    }
+
+    Event.add('goToCnvWeekday');
+    Event.add('backFromCnvWeekday');
+    Event.add('goToCnvWeekend');
+    Event.add('backFromCnvWeekend');
+    Event.add('changeBustime');
+    Event.add('tiktok');
+
+    Event.listen('goToCnvWeekday', function(){
+        realBusTime = busTime;
+        Event.trigger('changeBustime');
+    });
+    Event.listen('backFromCnvWeekday', function(){
+        realBusTime = backBusTime;
+        Event.trigger('changeBustime');
+    });
+    Event.listen('goToCnvWeekend', function(){
+        realBusTime = weekendBusTime;
+        Event.trigger('changeBustime');
+    });
+    Event.listen('backFromCnvWeekend', function(){
+        realBusTime = weekendBackBusTime;
+        Event.trigger('changeBustime');
+    });
+    Event.listen('changeBustime', function(){
+        setTable(realBusTime);
+        setNextTime();
+        setRemainderTime();
+        switch (realBusTime) {
+            case busTime:
+                console.log('1');
+                $direction.innerText = "(去谷里)";
+                break;
+            case backBusTime:
+                console.log('2');
+                $direction.innerText = "(回学校)";
+                break;
+            case weekendBusTime:
+                console.log('3');
+                $direction.innerText = "(去谷里)";
+                break;
+            case weekendBackBusTime:
+                console.log('4');
+                $direction.innerText = "(回学校)";
+                break;
+            default :
+                console.log("wrong");
+        }
+    });
+    Event.listen('tiktok', function(){
+        setTable(realBusTime);
+        setNextTime();
+        setRemainderTime();
+    });
 
 
     window.today = today;

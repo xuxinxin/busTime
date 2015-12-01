@@ -13,7 +13,8 @@ table {
   table caption {
     margin-bottom: 5px; }
   table .direction {
-    font-weight: bolder; }
+    font-weight: bolder;
+    cursor: pointer; }
   table th {
     font-weight: bold;
     padding: 15px 0;
