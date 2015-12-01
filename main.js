@@ -176,7 +176,8 @@
         //    Event.trigger('tiktok');
         //}
 
-        if(nextBusTime.hour < now.hour || nextBusTime.min < now.min){
+        if(nextBusTime.hour < now.hour || (nextBusTime.min < now.min && nextBusTime.hour == now.hour)){
+
             Event.trigger('tiktok');
         }
 
@@ -194,7 +195,14 @@
     //setTable(backBusTime);
 
     function setTable(data){
-        $table.innerHTML = '<caption>今天的班车时刻表 <span class="direction">(去谷里)</span></caption>';
+        var direction ="";
+        if(realBusTime == busTime || realBusTime == weekendBusTime){
+            direction = "(去谷里)"
+        }else{
+            direction = "(回学校)"
+        }
+        $table.innerHTML = '<caption>今天的班车时刻表 <span class="direction">'+direction+'</span></caption>';
+
         data.forEach(function(item,index){
             var className = "line line"+index;
             if(index < getNextBusIndex(realBusTime)){
@@ -281,24 +289,21 @@
         Event.trigger('changeBustime');
     });
     Event.listen('changeBustime', function(){
+        //console.log("trigger changeBustime");
         setTable(realBusTime);
         setNextTime();
         setRemainderTime();
         switch (realBusTime) {
             case busTime:
-                console.log('1');
                 $direction.innerText = "(去谷里)";
                 break;
             case backBusTime:
-                console.log('2');
                 $direction.innerText = "(回学校)";
                 break;
             case weekendBusTime:
-                console.log('3');
                 $direction.innerText = "(去谷里)";
                 break;
             case weekendBackBusTime:
-                console.log('4');
                 $direction.innerText = "(回学校)";
                 break;
             default :

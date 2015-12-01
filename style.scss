@@ -16,6 +16,7 @@ table{
   .direction{
     font-weight: bolder;
     cursor: pointer;
+    color: rgb(21,153,224);
   }
 
   th{
@@ -38,3 +39,19 @@ table{
   }
 }
 
+@media screen and (max-device-width: 480px)  {
+  body{
+    font-size: 3em;
+  }
+
+  table{
+    width: 90%;
+  }
+  caption{
+    margin-bottom: 25px;
+  }
+  .next-bus {
+    display: block;
+    margin: 10px auto;
+  }
+}
