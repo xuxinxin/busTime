@@ -14,7 +14,8 @@ table {
     margin-bottom: 5px; }
   table .direction {
     font-weight: bolder;
-    cursor: pointer; }
+    cursor: pointer;
+    color: #1599e0; }
   table th {
     font-weight: bold;
     padding: 15px 0;
@@ -27,5 +28,19 @@ table {
   table .next {
     background: #c0c0c0;
     color: yellow; }
+
+@media screen and (max-device-width: 480px) {
+  body {
+    font-size: 3em; }
+
+  table {
+    width: 90%; }
+
+  caption {
+    margin-bottom: 25px; }
+
+  .next-bus {
+    display: block;
+    margin: 10px auto; } }
 
 /*# sourceMappingURL=style.css.map */
