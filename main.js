@@ -2,7 +2,7 @@
  * Created by star on 15/11/19.
  */
 (function(){
-    console.log('hello');
+    'use strict';
     var DayTransform = ["星期日","星期一","星期二","星期三","星期四","星期五","星期六"];
     var busTime = [
         {time:"8:20", number:"2"},
@@ -45,7 +45,7 @@
     var backBusTime = getBackTime(busTime);
     var weekendBackBusTime = getBackTime(weekendBusTime);
     window.b = backBusTime;
-    $ = document.querySelector;
+
 
     function getBackTime(busTime){
        return busTime.map(function(item){
@@ -132,7 +132,6 @@
         }
     }
 
-    console.log(weekendBackBusTime);
 
     var $today = document.querySelector(".today");
     var $month = document.querySelector(".month");
@@ -161,7 +160,7 @@
     function setTime(){
         today = new Date();
         var todayArray = today.toString().split(' ');
-        $month.innerHTML = parseInt(today.getMonth())+1;
+        $month.innerHTML = String(today.getMonth()+1);
         $date.innerHTML = todayArray[2];
         $time.innerHTML = todayArray[4];
 
@@ -173,7 +172,11 @@
         var nextBusTime = getNextBusTime(realBusTime);
         setRemainderTime();
 
-        if(nextBusTime.hour == now.hour && nextBusTime.min == now.min && now.sec < 3){
+        //if(nextBusTime.hour == now.hour && nextBusTime.min == now.min && now.sec < 3){
+        //    Event.trigger('tiktok');
+        //}
+
+        if(nextBusTime.hour < now.hour || nextBusTime.min < now.min){
             Event.trigger('tiktok');
         }
 
@@ -194,14 +197,14 @@
         $table.innerHTML = '<caption>今天的班车时刻表 <span class="direction">(去谷里)</span></caption>';
         data.forEach(function(item,index){
             var className = "line line"+index;
-            if(index < getNextBusIndex(busTime)){
+            if(index < getNextBusIndex(realBusTime)){
                 className += " past";
-            }else if(index == getNextBusIndex(busTime)){
+            }else if(index == getNextBusIndex(realBusTime)){
                 className += " next";
             }
 
-            var line = "<tr class='"+className+"'><td>"+item.time+"</td><td>"+item.number+"</td></tr>";
-            $table.innerHTML += line;
+
+            $table.innerHTML += "<tr class='"+className+"'><td>"+item.time+"</td><td>"+item.number+"</td></tr>";
         });
 
         $direction = document.querySelector(".direction");
@@ -240,8 +243,8 @@
         var remainderTime = getRemainderTime(realBusTime);
         if(remainderTime){
             $remainderTime.display = "inline";
-            $remainderMinute.innerText = remainderTime.min;
-            $remainderSecond.innerText = remainderTime.sec;
+            $remainderMinute.innerText = ''+ remainderTime.min;
+            $remainderSecond.innerText = ''+remainderTime.sec;
         }else{
             $remainderTime.display = "none";
         }
@@ -251,6 +254,7 @@
     function isWeekendNow(){
         var now = new Date();
         return now.getDay() == 6 || now.getDay() == 0;
+        //return true;
     }
 
     Event.add('goToCnvWeekday');
