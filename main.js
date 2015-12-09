@@ -156,12 +156,12 @@
     var today = new Date();
     $today.innerHTML = DayTransform[parseInt(today.getDay())];
 
-    var realBusTime = busTime;
 
+    var realBusTime = busTime;
     if(isWeekendNow()){
         realBusTime = weekendBusTime;
     }
-
+    isNearSchool();
     setTime();
     setInterval(setTime,1000);
     setNextTime();
@@ -257,7 +257,6 @@
 
     function setRemainderTime(){
         var remainderTime = getRemainderTime(realBusTime);
-        console.log(remainderTime);
         if(remainderTime){
             $remainderTime.style.display = "inline";
             $remainderMinute.innerText = ''+ remainderTime.min;
@@ -325,6 +324,28 @@
         setNextTime();
         setRemainderTime();
     });
+
+
+    function isNearSchool(){
+        if ("geolocation" in navigator) {
+
+            //  公司的纬度 31.870075, 经度 118.8219623
+            navigator.geolocation.getCurrentPosition(function(position){
+
+                var latitude = parseInt(position.coords.latitude * 1000);
+                if(latitude < 31885){
+                    if(realBusTime !== backBusTime && realBusTime !== weekendBackBusTime){
+                        $direction.click();
+                    }
+                }
+            });
+        } else {
+            /* 地理位置服务不可用 */
+            console.log("地理位置不可用");
+            return true;
+        }
+    }
+
 
 
     window.today = today;
