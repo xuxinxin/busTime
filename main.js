@@ -89,6 +89,10 @@
             hour: (new Date()).getHours(),
             min: (new Date()).getMinutes()
         };
+        //var now = {
+        //    hour: 23,
+        //    min: 11
+        //};
         for(var i = 0 ; i<busTime.length;i++){
             var time = {
                 hour: +busTime[i].time.split(":")[0],
@@ -109,6 +113,12 @@
             min: (new Date()).getMinutes(),
             sec: (new Date()).getSeconds()
         };
+        //var now = {
+        //    hour: 23,
+        //    min: 11,
+        //    sec: 12
+        //};
+
         var nextTime = getNextBusTime(busTime);
         var remainderTime = {
             min: 0,
@@ -170,13 +180,11 @@
             sec: today.getSeconds()
         };
         var nextBusTime = getNextBusTime(realBusTime);
+
         setRemainderTime();
 
-        //if(nextBusTime.hour == now.hour && nextBusTime.min == now.min && now.sec < 3){
-        //    Event.trigger('tiktok');
-        //}
 
-        if(nextBusTime.hour < now.hour || (nextBusTime.min < now.min && nextBusTime.hour == now.hour)){
+        if(nextBusTime && (nextBusTime.hour < now.hour || (nextBusTime.min < now.min && nextBusTime.hour == now.hour))){
 
             Event.trigger('tiktok');
         }
@@ -249,12 +257,14 @@
 
     function setRemainderTime(){
         var remainderTime = getRemainderTime(realBusTime);
+        console.log(remainderTime);
         if(remainderTime){
-            $remainderTime.display = "inline";
+            $remainderTime.style.display = "inline";
             $remainderMinute.innerText = ''+ remainderTime.min;
             $remainderSecond.innerText = ''+remainderTime.sec;
         }else{
-            $remainderTime.display = "none";
+            console.log("no remainder");
+            $remainderTime.style.display = "none";
         }
 
     }
