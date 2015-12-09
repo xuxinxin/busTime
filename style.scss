@@ -47,12 +47,13 @@ table{
   table{
     width: 90%;
     margin-bottom: 20px;
+    caption{
+      margin-bottom: 25px;
+    }
+    .next-bus {
+      display: block;
+      margin: 10px auto;
+    }
   }
-  caption{
-    margin-bottom: 25px;
-  }
-  .next-bus {
-    display: block;
-    margin: 10px auto;
-  }
+
 }
