@@ -44,7 +44,8 @@
 
     var backBusTime = getBackTime(busTime);
     var weekendBackBusTime = getBackTime(weekendBusTime);
-    window.b = backBusTime;
+    var next ={};
+
 
 
     function getBackTime(busTime){
@@ -73,6 +74,7 @@
     }
 
     function getNextBusTime(busTime){
+        busTime = busTime || realBusTime;
         var nextBusIndex = getNextBusIndex(busTime);
         if(nextBusIndex){
             return {
@@ -89,10 +91,6 @@
             hour: (new Date()).getHours(),
             min: (new Date()).getMinutes()
         };
-        //var now = {
-        //    hour: 23,
-        //    min: 11
-        //};
         for(var i = 0 ; i<busTime.length;i++){
             var time = {
                 hour: +busTime[i].time.split(":")[0],
@@ -113,11 +111,6 @@
             min: (new Date()).getMinutes(),
             sec: (new Date()).getSeconds()
         };
-        //var now = {
-        //    hour: 23,
-        //    min: 11,
-        //    sec: 12
-        //};
 
         var nextTime = getNextBusTime(busTime);
         var remainderTime = {
@@ -125,9 +118,9 @@
             sec: 0
         };
         if(nextTime){
-            if( parseInt(nextTime.hour) > now.hour){
-                nextTime.min += 60;
-            }
+
+            nextTime.min += (parseInt(nextTime.hour)-now.hour)*60;
+
 
             remainderTime.min = nextTime.min - now.min -1;
             remainderTime.sec = 60 - now.sec;
@@ -164,6 +157,7 @@
     isNearSchool();
     setTime();
     setInterval(setTime,1000);
+    next = getNextBusTime();
     setNextTime();
     setTable(realBusTime);
 
@@ -179,13 +173,11 @@
             min: today.getMinutes(),
             sec: today.getSeconds()
         };
-        var nextBusTime = getNextBusTime(realBusTime);
 
         setRemainderTime();
 
 
-        if(nextBusTime && (nextBusTime.hour < now.hour || (nextBusTime.min < now.min && nextBusTime.hour == now.hour))){
-
+        if(next && (next.hour < now.hour || (next.min < now.min && next.hour == now.hour))){
             Event.trigger('tiktok');
         }
 
@@ -322,6 +314,7 @@
     Event.listen('tiktok', function(){
         setTable(realBusTime);
         setNextTime();
+        next = getNextBusTime();
         setRemainderTime();
     });
 
@@ -338,6 +331,7 @@
                         $direction.click();
                     }
                 }
+                console.log(position.coords);
             });
         } else {
             /* 地理位置服务不可用 */
