@@ -175,10 +175,13 @@
         };
 
         setRemainderTime();
-
+        if(next.min == now.min && next.hour == now.hour){
+            $remainderTime.style.visibility = 'hidden'
+        }
 
         if(next && (next.hour < now.hour || (next.min < now.min && next.hour == now.hour))){
             Event.trigger('tiktok');
+            $remainderTime.style.visibility = 'visible';
         }
 
         if(isWeekendNow()){
